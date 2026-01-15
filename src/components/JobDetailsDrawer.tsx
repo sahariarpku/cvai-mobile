@@ -184,6 +184,14 @@ export default function JobDetailsDrawer({ isOpen, onClose, job }: JobDetailsDra
                             </div>
                         </div>
 
+                        {/* Description */}
+                        <div>
+                            <label className="block text-xs font-bold uppercase text-gray-400 mb-2">About the Role</label>
+                            <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 text-sm leading-relaxed text-gray-700 whitespace-pre-line max-h-64 overflow-y-auto">
+                                {job.description || job.raw_data?.description || "No description available."}
+                            </div>
+                        </div>
+
                         {/* Documents */}
                         <div>
                             <div className="flex justify-between items-center mb-4">

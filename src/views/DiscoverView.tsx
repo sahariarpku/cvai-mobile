@@ -1,8 +1,9 @@
 
 import { useState, useEffect } from 'react';
 import { motion, useMotionValue, useTransform, AnimatePresence } from 'framer-motion';
-import { X, Heart, Briefcase, MapPin, GraduationCap, Info, ExternalLink } from 'lucide-react';
+import { X, Heart, Briefcase, MapPin, GraduationCap, ExternalLink } from 'lucide-react';
 import type { Job } from '../types';
+import DescriptionLoader from '../components/DescriptionLoader';
 import axios from 'axios';
 import { db, auth } from '../lib/firebase';
 import { collection, addDoc } from 'firebase/firestore';
@@ -117,6 +118,7 @@ export default function DiscoverView() {
                 </button>
             </div>
 
+
             {/* Job Details Modal */}
             <AnimatePresence>
                 {selectedJob && (
@@ -188,9 +190,14 @@ export default function DiscoverView() {
                                 </div>
                             </div>
 
-                            <div className="prose prose-sm max-w-none text-gray-600">
+                            {/* Fetch Description if missing */}
+                            <DescriptionLoader job={selectedJob} setJob={setSelectedJob} />
+
+                            <div className="text-gray-600">
                                 <h3 className="text-gray-900 font-bold text-lg mb-2">About the Role</h3>
-                                <p className="whitespace-pre-line">{selectedJob.description}</p>
+                                <p className="whitespace-pre-line leading-relaxed text-sm">
+                                    {selectedJob.description || "No description available for this role."}
+                                </p>
                             </div>
 
                             <div className="pb-8">
@@ -200,8 +207,11 @@ export default function DiscoverView() {
                                     rel="noreferrer"
                                     className="block w-full py-4 bg-primary text-white text-center font-bold rounded-xl shadow-lg shadow-blue-200 active:scale-[0.98] transition-transform flex items-center justify-center gap-2"
                                 >
-                                    Apply Now <ExternalLink size={18} />
+                                    See Full Details <ExternalLink size={18} />
                                 </a>
+                                <p className="text-center text-xs text-gray-400 mt-3">
+                                    Opens in your browser
+                                </p>
                             </div>
                         </div>
                     </motion.div>
@@ -274,7 +284,7 @@ function Card({ job, isTop, onSwipe, onInfo }: { job: Job, isTop: boolean, onSwi
                     onClick={(e) => { e.stopPropagation(); onInfo(); }}
                     className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/40 backdrop-blur-md rounded-full text-white transition-colors z-20"
                 >
-                    <Info size={24} />
+                    <ExternalLink size={24} />
                 </button>
             </div>
 
