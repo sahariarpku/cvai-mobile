@@ -7,6 +7,7 @@ import DescriptionLoader from '../components/DescriptionLoader';
 import axios from 'axios';
 import { db, auth } from '../lib/firebase';
 import { collection, addDoc } from 'firebase/firestore';
+import { settingsService } from '../services/settingsService';
 
 // Mock data removed per warning
 
@@ -14,17 +15,33 @@ export default function DiscoverView() {
     const [jobs, setJobs] = useState<Job[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+    const [userPreferences, setUserPreferences] = useState({ keywords: 'academic' });
+
+    useEffect(() => {
+        // Subscribe to user preferences
+        const user = auth.currentUser;
+        if (user) {
+            const unsub = settingsService.subscribeSettings(user.uid, (settings) => {
+                if (settings?.jobPreferences?.keywords) {
+                    setUserPreferences({ keywords: settings.jobPreferences.keywords });
+                }
+            });
+            return () => unsub();
+        }
+    }, []);
 
     useEffect(() => {
         fetchJobs();
-    }, []);
+    }, [userPreferences]);
 
     const fetchJobs = async () => {
         try {
             setLoading(true);
             // Use environment variable for API URL
             const apiUrl = import.meta.env.VITE_API_URL || '';
-            const res = await axios.get(`${apiUrl}/api/jobs/search`);
+            // Use user's preferred keywords or default to 'academic'
+            const searchQuery = userPreferences.keywords || 'academic';
+            const res = await axios.get(`${apiUrl}/api/jobs/search?q=${encodeURIComponent(searchQuery)}`);
             // Server returns { jobs: [...] }
             let data = res.data.jobs || [];
 
