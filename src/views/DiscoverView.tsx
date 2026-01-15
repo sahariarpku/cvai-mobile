@@ -22,7 +22,9 @@ export default function DiscoverView() {
     const fetchJobs = async () => {
         try {
             setLoading(true);
-            const res = await axios.get('/api/jobs/search');
+            // Use environment variable for API URL
+            const apiUrl = import.meta.env.VITE_API_URL || '';
+            const res = await axios.get(`${apiUrl}/api/jobs/search`);
             // Server returns { jobs: [...] }
             let data = res.data.jobs || [];
 
